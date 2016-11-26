@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>聊天室</title>
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <div class="row col-md-12">
+        <div class="panel panel-success">
+            <div class="panel-heading text-center">珠峰聊天室</div>
+            <div class="panel-body">
+                <ul class="list-group">
+                    <li class="list-group-item">张三说</li>
+                </ul>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-11">
+                        <input type="text" class="form-control">
+                    </div>
+                    <div class="col-md-1">
+                        <button class="btn btn-primary">发送</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    /**
+     * 1. 实现聊天的功能
+     * 2. 实现用户聊天功能
+     * 3. 实现私聊的功能
+     * 4. 实现房间的功能
+     * @type {*}
+     */
+    window.onload = function (){
+        //当引入socket.io脚本之后会在window增加一个io的全局变量
+        var socket = io.connect('http://localhost:8080/');
+        //监听连接成功事件，连接成功后会自动调用回调函数
+        socket.on('connect',function(){
+            console.log('连接成功');
+        })
+        //监听服务器发过来的消息，
+        socket.on('message',function(message){
+            console.log(message);
+        });
+    }
+</script>
+</body>
+</html>

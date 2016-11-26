@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script>
+    // WebSocket是一个原生的类 在浏览器里直接可以用
+    var socket = new WebSocket('ws://localhost:8080');
+
+    // 钩子函数 监听客户端连接成功事件
+    socket.onopen = function() {
+        console.log('connected');
+        socket.send('hello i am client from browser');
+    };
+    socket.onmessage = function (event) {
+        console.log(event.data);
+    };
+</script>
+</body>
+</html>

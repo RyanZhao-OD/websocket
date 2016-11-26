@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>聊天室</title>
+</head>
+<body>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    //当引入socket.io脚本之后会在window增加一个io的全局变量
+    var socket = io.connect('http://localhost:8080/');
+    //监听连接成功事件，连接成功后会自动调用回调函数
+    socket.on('connect', function() {
+        console.log('连接成功');
+    });
+    //监听服务器发过来的消息，
+    socket.on('message', function(message){
+        console.log(message);
+    });
+</script>
+</body>
+</html>

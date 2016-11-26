@@ -5,7 +5,9 @@ let app = express();
 app.get('/', function(request, response) {
     //发送文件到客户端
     //当发送一个HTML文件的时候，如果用相对路径，那么要指定绝对目录。也可以指定绝对路径
-    response.sendFile('./index.html', {root:__dirname});
+    response.sendFile('./index.html', {
+        root: __dirname
+    });
 });
 
 //创建一个http的服务器

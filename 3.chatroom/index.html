@@ -2,27 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>聊天室</title>
+    <title>珠峰聊天室</title>
     <!-- 新 Bootstrap 核心 CSS 文件 -->
-    <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/bootstrap.min.css">
+    <style>
+        .user{
+            color:blue;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
     <div class="row col-md-12">
         <div class="panel panel-success">
-            <div class="panel-heading text-center">珠峰聊天室</div>
+            <div class="panel-heading text-center">
+                <div class="row">
+                    <div class="col-md-2">
+                        <button onclick="join()" class="btn btn-primary">进入房间</button>
+                    </div>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" id="room">
+                    </div>
+                </div>
+            </div>
             <div class="panel-body">
-                <ul class="list-group">
-                    <li class="list-group-item">张三说</li>
+                <ul class="list-group" id="messages">
                 </ul>
             </div>
             <div class="panel-footer">
                 <div class="row">
                     <div class="col-md-11">
-                        <input type="text" class="form-control">
+                        <input id="content" type="text" class="form-control" onkeydown="confirm(event)">
                     </div>
                     <div class="col-md-1">
-                        <button class="btn btn-primary">发送</button>
+                        <button onclick="send()" class="btn btn-primary">发送</button>
                     </div>
                 </div>
             </div>
@@ -44,11 +58,52 @@
         //监听连接成功事件，连接成功后会自动调用回调函数
         socket.on('connect',function(){
             console.log('连接成功');
+            //客户端连接成功后向服务器发送getAllMessages事件，获取所有的历史消息
+            socket.emit('getAllMessages');
         })
-        //监听服务器发过来的消息，
-        socket.on('message',function(message){
-            console.log(message);
+        //监听服务器发回来所有历史消息数组
+        socket.on('allMessages',function(messages){
+            document.getElementById('messages').innerHTML = messages.map(function(msgObj){
+                return `<li class="list-group-item"><span class="user">${msgObj.author}</span>:${msgObj.content} <span class="pull-right">${msgObj.createAt.toLocaleString()}</span></li>`;
+            }).join('')
         });
+        //监听服务器发过来的消息，
+        socket.on('message',function(msgObj){
+            var li = document.createElement('li');
+            li.innerHTML = `<span class="user">${msgObj.author}</span>:${msgObj.content} <span class="pull-right">${msgObj.createAt.toLocaleString()}</span>`;
+            li.className = 'list-group-item';
+            document.getElementById('messages').appendChild(li);
+        });
+        window.socket = socket;
+    }
+    function send(){
+        //1.取得要发言的内容
+        var content = document.getElementById('content').value;
+        //2.把内容发送到后台服务器
+        socket.send(content);
+        document.getElementById('content').value = '';
+    }
+    function confirm(event){
+        //如果按下的回车键 ，则直接发送消息
+        if(event.keyCode == 13){
+            send();
+        }
+    }
+    var messages = document.getElementById('messages');
+    var content = document.getElementById('content');
+    messages.addEventListener('click',function(event){
+        //   |user |   | user |   | user|
+        if(/(^| +)user($| +)/.test(event.target.className)){
+            var author = event.target.innerHTML;
+            content.value = `@${author} `;
+        }
+    })
+    //进房
+    function join(){
+        //先得到房间名
+        var room = document.getElementById('room').value;
+        //向服务器发消息，说我要进入 room 这个房间
+        socket.emit('join',room);
     }
 </script>
 </body>
